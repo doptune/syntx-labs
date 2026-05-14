@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Syntx Labs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module">
+    import { invoke } from 'https://unpkg.com/@tauri-apps/api@2/core';
+    window.tauriInvoke = invoke;
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="vce-sidebar" id="vce-sidebar">
+      <!-- Header -->
+      <div class="vce-sidebar-header">
+        <div class="vce-sidebar-brand">
+          <span class="vce-sidebar-title">&lt;/&gt; Syntx Labs</span>
+        </div>
+      </div>
+
+      <hr class="vce-sidebar-sep" />
+
+      <!-- Projects button -->
+      <div class="project-button-wrapper">
+        <button class="vce-sidebar-projects-btn" id="vce-sidebar-projects-btn">
+          <i data-lucide="folder" style="width:14px;height:14px;"></i>
+          <span>Projects</span>
+        </button>
+
+        <button class="vce-sidebar-projects-btn" id="vce-sidebar-new-btn">
+          <i data-lucide="plus" style="width:16px;height:16px;"></i>
+          <span>New Environment</span>
+        </button>
+
+        <button class="vce-sidebar-projects-btn" id="vce-sidebar-search-btn">
+          <i data-lucide="search" style="width:14px;height:14px;"></i>
+          <span>Search</span>
+        </button>
+      </div>
+
+      <hr class="vce-sidebar-sep" />
+      <!-- Search bar (hidden by default) -->
+      <div class="vce-sidebar-search" id="vce-sidebar-search">
+        <input type="text" class="vce-sidebar-search-input" id="vce-sidebar-search-input"
+          placeholder="Search environments..." />
+      </div>
+
+      <!-- Chat history -->
+      <div class="vce-sidebar-history-label">Recent</div>
+      <ul class="vce-sidebar-history" id="vce-sidebar-history"></ul>
+
+      <!-- Footer -->
+      <hr class="vce-sidebar-sep" />
+      <div class="vce-sidebar-footer">
+        <button class="vce-exit-btn" id="vce-exit-btn">
+          <i data-lucide="log-out" style="width:13px;height:13px;"></i>
+          <span>Exit VCE</span>
+        </button>
+      </div>
+    </div>
+    <nav class="left-panel">
+      <div class="panel-header">
+        <h1 class="panel-heading">System</h1>
+        <div class="panel-more-wrapper" id="panel-more-wrapper">
+          <button class="panel-more-btn" id="panel-more-btn">⋯</button>
+          <div class="panel-more-menu" id="panel-more-menu">
+            <div class="panel-more-item danger" id="panel-delete-all">Delete System</div>
+          </div>
+        </div>
+      </div>
+      <hr class="panel-separator" />
+      <ul class="nav-list">
+        <li class="nav-item">Knowledge Ontology</li>
+        <li class="nav-item nav-item-console" id="nav-instruction-console">
+          <span class="nav-item-label">Instruction Console</span>
+          <button class="nav-session-add" id="nav-session-add" title="New session">
+            <i data-lucide="plus" style="width:11px;height:11px;"></i>
+          </button>
+          <button class="nav-session-chevron" id="nav-session-chevron" title="Sessions">
+            <i data-lucide="chevron-right" style="width:11px;height:11px;"></i>
+          </button>
+        </li>
+
+        <!-- Session list -->
+        <ul class="session-list" id="session-list">
+          <!-- sessions appear here -->
+        </ul>
+        <hr class="session-separator" id="session-separator" />
+        <li class="nav-item">Validation Chat Environment</li>
+        <li class="nav-item">Skill Constellation</li>
+        <li class="nav-item">Workflow Orchestrator</li>
+      </ul>
+
+      <hr class="panel-separator" />
+
+      <ul class="nav-list bottom-nav-list">
+        <li class="nav-item">Settings</li>
+        <li class="nav-item">Get Help</li>
+        <li class="nav-item">About</li>
+      </ul>
+
+      <div class="panel-footer">
+        <hr class="panel-separator" />
+        <div class="footer-brand">
+          <span class="footer-brand-name">Syntx Labs</span>
+          <span class="footer-chevron">‹</span>
+        </div>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="section" id="section-knowledge-ontology">
+        <div class="ontology-toolbar">
+          <button class="toolbar-btn" title="pan">
+            <i data-lucide="hand" style="width:14px;height:14px;"></i>
+          </button>
+          <button class="toolbar-btn" title="select">
+            <i data-lucide="mouse-pointer" style="width:14px;height:14px;"></i>
+          </button>
+          <button class="toolbar-btn" title="box select">
+            <i data-lucide="box-select" style="width:14px;height:14px;"></i>
+          </button>
+          <button class="toolbar-btn" title="rename">
+            <i data-lucide="pencil-line" style="width:14px;height:14px;"></i>
+          </button>
+          <div class="toolbar-node-info" id="toolbar-node-info">
+            <span id="toolbar-node-name"></span>
+            <div class="toolbar-node-actions">
+              <button class="toolbar-node-btn toolbar-node-delete" id="toolbar-node-delete">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="ontology-explorer">
+          <div class="explorer-item">
+            <i data-lucide="folder" style="width:12px;height:12px;"></i>
+            <span class="explorer-label">base</span>
+            <i data-lucide="chevron-right" class="explorer-chevron" style="width:12px;height:12px;"></i>
+          </div>
+        </div>
+        <div class="tree-canvas">
+          <div class="tree-world" id="tree-world">
+            <!-- nodes and lines will go here -->
+          </div>
+        </div>
+        <div class="canvas-error" id="canvas-error"></div>
+        <div class="canvas-size-info" id="canvas-size-info">base: 0 B</div>
+      </div>
+      <div class="section" id="section-instruction-console">
+
+        <!-- Top toolbar -->
+        <div class="console-toolbar">
+          <span class="console-objective">
+            <span class="console-objective-label">Objective :</span>
+            <span class="console-objective-text" id="console-objective-text">—</span>
+          </span>
+          <div class="console-status">
+            <span class="console-status-text" id="console-status-text">Training in halt</span>
+            <div class="console-status-dot" id="console-status-dot"></div>
+          </div>
+        </div>
+
+        <!-- Message area -->
+        <div class="console-messages" id="console-messages"></div>
+
+        <div class="cmd-palette" id="cmd-palette">
+          <div class="cmd-item" data-cmd="/train">
+            <span class="cmd-name" style="color: #FF4D00;">/train</span>
+          </div>
+          <div class="cmd-item" data-cmd="/skill">
+            <span class="cmd-name" style="color: #4D7EFF;">/skill</span>
+          </div>
+          <div class="cmd-item" data-cmd="/workflow">
+            <span class="cmd-name" style="color: #2DBD6E;">/workflow</span>
+          </div>
+          <div class="cmd-item" data-cmd="/automate">
+            <span class="cmd-name" style="color: #2DBD6E;">/automate</span>
+          </div>
+          <div class="cmd-item" data-cmd="/specify">
+            <span class="cmd-name" style="color: #888;">/specify</span>
+          </div>
+          <div class="cmd-item" data-cmd="/sub">
+            <span class="cmd-name" style="color:#2DBD6E;">/sub</span>
+          </div>
+          <div class="cmd-item" data-cmd="/endsub">
+            <span class="cmd-name" style="color:#aaa;">/endsub</span>
+          </div>
+          <div class="cmd-item" data-cmd="/quit">
+            <span class="cmd-name" style="color:#FF4D00;">/quit</span>
+          </div>
+          <div class="cmd-item" data-cmd="/recall">
+            <span class="cmd-name" style="color:#2DBD6E;">/recall</span>
+          </div>
+        </div>
+
+        <!-- Instruction feed -->
+        <div class="instruction-feed">
+          <textarea class="feed-input" id="feed-input" placeholder="Instruction feed" rows="1"></textarea>
+          <div class="feed-actions">
+            <button class="feed-send-btn" id="feed-send-btn">
+              <i data-lucide="arrow-up" style="width:13px;height:13px;"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="section" id="section-validation-core">
+        <div class="vce-top-bar">
+          <span id="vce-chat-header">New Environment</span>
+        </div>
+        <div class="vce-messages" id="vce-messages"></div>
+        <div class="vce-input-area">
+          <div class="vce-input-box">
+            <textarea class="vce-input" id="vce-input" placeholder="Send a message..." rows="1"></textarea>
+            <div class="vce-input-bottom">
+              <div class="vce-input-right">
+                <button class="vce-speak-btn" title="Speak">
+                  <span class="vce-speak-icon">
+                    <i data-lucide="mic" style="width:16px;height:16px;"></i>
+                  </span>
+                  <span class="vce-speak-label">Speak</span>
+                </button>
+                <button class="vce-send-btn" id="vce-send-btn" title="Send">
+                  <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section" id="section-skill-constellation">
+        <div class="console-toolbar">
+          <div class="toolbar-left">
+            <span class="section-title">Skill Constellation</span>
+          </div>
+          <div class="toolbar-right">
+            <div style="position:relative;">
+              <button class="toolbar-btn primary" id="sc-sort-btn">Sort by ▾</button>
+              <div id="sc-sort-menu">
+                <div class="context-item" onclick="sortSkills('src')">Sort by src</div>
+                <div class="context-item" onclick="sortSkills('last_executed')">Sort by last executed</div>
+                <div class="context-item" onclick="sortSkills('filesize')">Sort by memory</div>
+              </div>
+            </div>
+            <button class="toolbar-btn primary" id="sc-new-btn">New</button>
+          </div>
+        </div>
+
+        <div class="sc-panels">
+          <!-- TOP: Grid Table -->
+          <div class="sc-grid-panel" id="sc-grid-panel">
+            <div class="skills-grid-container">
+              <div class="grid-header" id="skills-header">
+                <div class="cell col-src" style="width: 60px;">s r c <div class="resizer"></div>
+                </div>
+                <div class="cell col-name" style="width: 150px;">skill name <div class="resizer"></div>
+                </div>
+                <div class="cell col-mem" style="width: 100px;">memory <span class="mem-icon">A</span>
+                  <div class="resizer"></div>
+                </div>
+                <div class="cell col-source" style="width: 140px;">source <div class="resizer"></div>
+                </div>
+                <div class="cell col-ontology" style="width: 180px;">used ontology <div class="resizer"></div>
+                </div>
+                <div class="cell col-executed" style="width: 150px;">last executed <div class="resizer"></div>
+                </div>
+                <div class="cell col-desc" style="width: 200px;">description <div class="resizer"></div>
+                </div>
+                <div class="cell col-workflows" style="width: 150px;">used workflows <div class="resizer"></div>
+                </div>
+              </div>
+              <div class="grid-body" id="skills-body">
+              </div>
+            </div>
+          </div>
+
+          <!-- DIVIDER -->
+          <div class="sc-divider" id="sc-divider"></div>
+
+          <!-- BOTTOM: Node Graph -->
+          <div class="sc-graph-panel" id="sc-graph-panel">
+            <svg width="100%" height="100%" id="constellation-svg" viewBox="0 0 680 300"
+              preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+        </div>
+
+      </div>
+      <div class="section" id="section-workflow-orchestrator">
+        <div class="console-toolbar">
+          <div class="toolbar-left">
+            <span class="section-title" id="workflow-section-title">Workflows</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="toolbar-btn" id="wf-back-btn" style="display: none;">
+              <span>Back</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="workflow-view active" id="wf-view-grid">
+          <div class="workflow-grid-container">
+            <div class="workflow-card" id="card-google-search">
+              <div class="card-main">
+                <div class="card-icon-wrapper">
+                  <img src="https://www.google.com/favicon.ico" alt="Google" class="card-brand-icon">
+                </div>
+                <i data-lucide="chevron-right" class="card-chevron"></i>
+              </div>
+              <div class="card-footer">
+                <span class="card-tag">[Google_search]</span>
+                <span class="card-count">4</span>
+              </div>
+            </div>
+          </div>
+          <div class="workflow-status-bar">
+            <span class="total-count">Total Workflows : 1</span>
+          </div>
+        </div>
+
+        <div class="workflow-view" id="wf-view-details">
+          <div class="editor-toolbar">
+            <div class="tool-group">
+              <button class="tool-btn active" id="tool-hand" title="Hand Tool (Pan)">
+                <i data-lucide="hand" style="width:14px;height:14px;"></i>
+              </button>
+              <button class="tool-btn" id="tool-pointer" title="Pointer Tool (Select/Edit)">
+                <i data-lucide="mouse-pointer" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
+            <div class="action-group">
+              <button class="action-btn delete-btn"><i data-lucide="trash-2"
+                  style="width:14px;height:14px;"></i></button>
+              <button class="action-btn run-btn">Run</button>
+            </div>
+          </div>
+
+          <div class="node-canvas" id="node-canvas">
+            <div class="node-world" id="node-world">
+              <svg class="node-svg" id="node-svg"></svg>
+
+              <div class="workflow-node" style="left: 100px; top: 200px;">
+                <div class="node-label">[User_Input]</div>
+                <div class="node-content">
+                  <div class="node-row editable-comment">// user asks a qu...</div>
+                  <div class="node-row">-- Input : Query</div>
+                  <div class="node-row">-- Type : Manual</div>
+                </div>
+                <div class="node-port port-right"></div>
+              </div>
+
+              <div class="workflow-node" style="left: 350px; top: 250px;">
+                <div class="node-label">[Open_application]</div>
+                <div class="node-content">
+                  <div class="node-row editable-comment">// open browser</div>
+                  <div class="node-row">-- App: Chrome</div>
+                  <div class="node-row">-- URL: google.c...</div>
+                </div>
+                <div class="node-port port-left"></div>
+                <div class="node-port port-right"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section" id="section-settings">
+        <div class="console-toolbar">
+          <div class="toolbar-left">
+            <span class="section-title">Settings</span>
+          </div>
+        </div>
+        <div class="settings-content">
+
+          <div class="sg">
+            <div class="sg-title">Appearance</div>
+
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Theme</span>
+                <span class="sr-hint">Color scheme for the entire app</span>
+              </div>
+              <div class="seg-group" id="theme-group">
+                <button class="seg-btn" data-val="light">Light</button>
+                <button class="seg-btn" data-val="dark">Dark</button>
+                <button class="seg-btn" data-val="system">System</button>
+              </div>
+            </div>
+
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Font Size</span>
+                <span class="sr-hint">Text size across the UI</span>
+              </div>
+              <div class="seg-group" id="fontsize-group">
+                <button class="seg-btn" data-val="small">Small</button>
+                <button class="seg-btn" data-val="medium">Medium</button>
+                <button class="seg-btn" data-val="large">Large</button>
+              </div>
+            </div>
+
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Font Family</span>
+                <span class="sr-hint">Switch between serif and monospace</span>
+              </div>
+              <div class="seg-group" id="fontfamily-group">
+                <button class="seg-btn" data-val="serif">Serif</button>
+                <button class="seg-btn" data-val="mono">Mono</button>
+              </div>
+            </div>
+          </div>
+
+          <hr class="s-sep" />
+
+          <div class="sg">
+            <div class="sg-title">Sidebar & Navigation</div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Collapse sidebar by default</span>
+                <span class="sr-hint">Left panel starts collapsed on launch</span>
+              </div>
+              <label class="tog">
+                <input type="checkbox" id="tog-sidebar" />
+                <span class="tog-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <hr class="s-sep" />
+
+          <div class="sg">
+            <div class="sg-title">Editor & Workspace</div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Default section on launch</span>
+                <span class="sr-hint">Which section opens when the app starts</span>
+              </div>
+              <select class="s-select" id="sel-default-section">
+                <option value="section-instruction-console">Instruction Console</option>
+                <option value="section-knowledge-ontology">Knowledge Ontology</option>
+                <option value="section-validation-core">Validation Chat Environment</option>
+                <option value="section-skill-constellation">Skill Constellation</option>
+                <option value="section-workflow-orchestrator">Workflow Orchestrator</option>
+                <option value="section-settings">Settings</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="s-sep" />
+
+          <div class="sg">
+            <div class="sg-title">Notifications & Feedback</div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Sound on completion</span>
+                <span class="sr-hint">Soft tone on /quit, skill and workflow finish</span>
+              </div>
+              <label class="tog">
+                <input type="checkbox" id="tog-sound" />
+                <span class="tog-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <hr class="s-sep" />
+
+          <div class="sg">
+            <div class="sg-title">Accessibility</div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Reduce motion</span>
+                <span class="sr-hint">Disables animations in the chat environment</span>
+              </div>
+              <label class="tog">
+                <input type="checkbox" id="tog-motion" />
+                <span class="tog-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <hr class="s-sep" />
+
+          <div class="sg">
+            <div class="sg-title">Privacy & Session</div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Clear local cache</span>
+                <span class="sr-hint">Removes position data and temp files</span>
+              </div>
+              <button class="s-btn danger" id="btn-clear">Clear Cache</button>
+            </div>
+            <div class="sr">
+              <div class="sr-left">
+                <span class="sr-label">Export everything</span>
+                <span class="sr-hint">Downloads your skills, workflows and knowledge as JSON</span>
+              </div>
+              <button class="s-btn" id="btn-export">Export</button>
+            </div>
+          </div>
+
+        </div>
+        <div class="sg">
+          <div class="sg-title">AI Model</div>
+          <div class="sr">
+            <div class="sr-left">
+              <span class="sr-label">Active model</span>
+              <span class="sr-hint" id="settings-model-hint">Loading...</span>
+            </div>
+            <button class="s-btn" id="btn-change-model">Change Model</button>
+          </div>
+        </div>
+      </div>
+      <div class="section" id="section-help">
+        <div class="console-toolbar">
+          <div class="toolbar-left">
+            <span class="section-title">Get Help</span>
+          </div>
+        </div>
+        <div class="help-content">
+          <div class="docs-container">
+
+            <div class="docs-header">
+              <div class="docs-eyebrow">SYNTX LABS / DOCUMENTATION</div>
+
+              <h1 class="docs-title">Syntx Labs</h1>
+
+              <p class="docs-subtitle">
+                Local AI training, workflow orchestration, automation runtime,
+                and ontology-driven execution environment.
+              </p>
+
+              <div class="docs-meta">
+                <span>Version 1.0</span>
+                <span>MIT Licensed</span>
+                <span>Doptune</span>
+              </div>
+            </div>
+
+            <div class="docs-section">
+
+              <div class="docs-section-label">OVERVIEW</div>
+
+              <p class="docs-paragraph">
+                Syntx Labs is a fully local AI execution environment designed for
+                ontology-based knowledge training, deterministic skill execution,
+                workflow orchestration, and local automation pipelines.
+              </p>
+
+              <p class="docs-paragraph">
+                The platform combines a Tauri desktop shell, a Python execution
+                backend, local Ollama-hosted models, and SQLite-backed knowledge
+                structures into a unified runtime architecture.
+              </p>
+
+            </div>
+
+            <div class="docs-section">
+
+              <div class="docs-section-label">ARCHITECTURE</div>
+
+              <pre class="docs-code">Tauri (Rust)
+  ├── Windowing
+  ├── IPC
+  ├── Filesystem Access
+  └── Process Spawning
+
+Frontend (HTML/CSS/JS)
+  ├── Knowledge Ontology
+  ├── Instruction Console
+  ├── Validation Environment
+  ├── Skill Constellation
+  └── Workflow Orchestrator
+
+Python Runtime
+  ├── Skill Executor
+  ├── Workflow Executor
+  ├── Capability Checker
+  ├── Action Library
+  └── Parser Layer
+
+Persistence Layer
+  └── SQLite Ontology Databases</pre>
+
+            </div>
+
+            <div class="docs-section">
+
+              <div class="docs-section-label">CORE COMPONENTS</div>
+
+              <div class="docs-table">
+
+                <div class="docs-row docs-row-head">
+                  <div>Component</div>
+                  <div>Description</div>
+                </div>
+
+                <div class="docs-row">
+                  <div>Knowledge Ontology</div>
+                  <div>Persistent structured knowledge graph using SQLite nodes.</div>
+                </div>
+
+                <div class="docs-row">
+                  <div>Instruction Console</div>
+                  <div>Primary command execution and training interface.</div>
+                </div>
+
+                <div class="docs-row">
+                  <div>Validation Chat Environment</div>
+                  <div>Context-aware conversational runtime with skill execution.</div>
+                </div>
+
+                <div class="docs-row">
+                  <div>Skill Constellation</div>
+                  <div>Skill registry and execution visualization system.</div>
+                </div>
+
+                <div class="docs-row">
+                  <div>Workflow Orchestrator</div>
+                  <div>Conditional multi-step automation execution engine.</div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="docs-section">
+
+              <div class="docs-section-label">COMMANDS EXAMPLES</div>
+
+              <pre class="docs-code">/train --text -science
+/sub quantum_physics
+/skill create
+/skill run quick_facts {"topic":"Black_holes"}
+/workflow create
+/workflow run quick_research {"topic":"AI"}</pre>
+
+            </div>
+
+            <div class="docs-section">
+
+              <div class="docs-section-label">RUNTIME CHARACTERISTICS</div>
+
+              <ul class="docs-list">
+                <li>Fully local execution model</li>
+                <li>No remote inference dependency</li>
+                <li>Ontology-backed retrieval architecture</li>
+                <li>Cross-platform desktop compatibility</li>
+                <li>Dynamic workflow branching support</li>
+                <li>Extensible Python action runtime</li>
+              </ul>
+
+            </div>
+
+            <div class="docs-footer">
+              A Doptune Product
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="context-menu" id="context-menu">
+    <div class="context-item" id="ctx-share-node">Share Node Data</div>
+    <div class="context-item" id="ctx-reveal-node">Reveal in explorer</div>
+    <div class="context-item" id="ctx-usage-node">Usage</div>
+    <div class="context-separator"></div>
+    <div class="context-item context-danger" id="ctx-delete-node">Delete node <span class="context-shortcut">Shift +
+        Del</span></div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h2 class="modal-title">Delete Node</h2>
+      <p class="modal-message">Are you sure you want to delete <span id="modal-node-name"></span>? This action cannot be
+        undone.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="modal-cancel">Cancel</button>
+        <button class="modal-btn modal-confirm" id="modal-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="context-menu" id="session-context-menu">
+    <div class="context-item" id="ctx-session-rename">Rename</div>
+    <div class="context-item" id="ctx-session-star">Star</div>
+    <div class="context-item" id="ctx-session-share">Share</div>
+    <div class="context-separator"></div>
+    <div class="context-item context-danger" id="ctx-session-delete">Delete</div>
+  </div>
+
+  <div class="modal-overlay" id="session-modal-overlay">
+    <div class="modal">
+      <h2 class="modal-title">Delete Session</h2>
+      <p class="modal-message">Are you sure you want to delete <span id="session-modal-name"></span>? This action cannot
+        be undone.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="session-modal-cancel">Cancel</button>
+        <button class="modal-btn modal-confirm" id="session-modal-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="context-menu" id="feed-context-menu">
+    <div class="context-item" id="ctx-feed-upload">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i data-lucide="paperclip" style="width:12px;height:12px;"></i>
+        <span>Upload files</span>
+      </div>
+    </div>
+    <div class="context-item" id="ctx-feed-voice">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i data-lucide="mic" style="width:12px;height:12px;"></i>
+        <span>Voice input</span>
+      </div>
+    </div>
+    <div class="context-separator"></div>
+    <div class="context-item context-danger" id="ctx-feed-clear">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i data-lucide="x" style="width:12px;height:12px;"></i>
+        <span>Clear</span>
+      </div>
+    </div>
+  </div>
+  <div class="context-menu" id="vce-history-context-menu" style="display:none;">
+    <div class="context-item" id="ctx-vce-rename">Rename</div>
+    <div class="context-item" id="ctx-vce-star">Star</div>
+    <div class="context-separator"></div>
+    <div class="context-item context-danger" id="ctx-vce-delete">Delete</div>
+  </div>
+
+  <div class="modal-overlay" id="vce-rename-overlay">
+    <div class="modal">
+      <h2 class="modal-title">Rename Environment</h2>
+      <input type="text" class="vce-rename-input" id="vce-rename-input" placeholder="Environment name..." />
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="vce-rename-cancel">Cancel</button>
+        <button class="modal-btn modal-confirm" id="vce-rename-confirm">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="vce-delete-overlay">
+    <div class="modal">
+      <h2 class="modal-title">Delete Environment</h2>
+      <p class="modal-message">Are you sure you want to delete <span id="vce-delete-name"></span>? This cannot be
+        undone.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="vce-delete-cancel">Cancel</button>
+        <button class="modal-btn modal-confirm" id="vce-delete-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+  <div class="vce-toast" id="vce-toast"></div>
+  <div class="modal-overlay" id="delete-system-overlay">
+    <div class="modal">
+      <h2 class="modal-title">Delete System</h2>
+      <p class="modal-message">This will permanently delete <span>all knowledge, skills, workflows and sessions</span>.
+        This cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-cancel" id="delete-system-cancel">Cancel</button>
+        <button class="modal-btn modal-confirm" id="delete-system-confirm">Delete Everything</button>
+      </div>
+    </div>
+  </div>
+  <!-- Model Selection Overlay -->
+  <div class="modal-overlay" id="model-select-overlay" style="display:none;">
+    <div class="modal" style="width:520px;max-width:95vw;padding:0;overflow:hidden;border-radius:12px;">
+
+      <!-- Header -->
+      <div style="padding:24px 24px 0 24px;">
+        <h2 style="font-size:16px;font-weight:700;margin:0 0 4px 0;">Select AI Model</h2>
+        <p style="font-size:12px;color:#888;margin:0 0 16px 0;">
+          Choose your local model. Both text and vision use the same model.
+        </p>
+
+        <!-- Search -->
+        <div style="position:relative;margin-bottom:16px;">
+          <input type="text" id="model-search-input" placeholder="Search models..." style="width:100%;padding:8px 12px 8px 32px;border:1px solid #ddd;
+                 border-radius:6px;font-size:12px;font-family:monospace;
+                 box-sizing:border-box;outline:none;" />
+          <i data-lucide="search" style="position:absolute;left:10px;top:50%;
+           transform:translateY(-50%);width:13px;height:13px;color:#aaa;"></i>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="model-tab active" data-tab="installed" style="padding:5px 14px;border:1px solid #ddd;border-radius:20px;
+                 font-size:11px;cursor:pointer;background:#FF4D00;color:white;border-color:#FF4D00;">
+            Installed
+          </button>
+          <button class="model-tab" data-tab="available" style="padding:5px 14px;border:1px solid #ddd;border-radius:20px;
+                 font-size:11px;cursor:pointer;background:white;color:#333;">
+            Available to Download
+          </button>
+        </div>
+      </div>
+
+      <!-- Model List -->
+      <div id="model-list-container" style="max-height:320px;overflow-y:auto;padding:0 24px 16px 24px;">
+        <div id="model-list" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="text-align:center;padding:20px;color:#aaa;font-size:12px;">
+            Loading models...
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar (hidden by default) -->
+      <div id="model-progress-wrapper" style="display:none;padding:0 24px 16px 24px;">
+        <div style="font-size:11px;font-family:monospace;color:#666;margin-bottom:6px;" id="model-progress-label">
+          Downloading...</div>
+        <div style="background:#f0f0f0;border-radius:4px;height:6px;overflow:hidden;">
+          <div id="model-progress-bar"
+            style="width:0%;height:100%;background:#FF4D00;transition:width 0.3s;border-radius:4px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:14px 24px;border-top:1px solid #f0f0f0;display:flex;
+                justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:#aaa;" id="model-current-label">
+          Current: loading...
+        </span>
+        <button id="model-select-close" style="padding:6px 18px;background:#f5f5f5;border:1px solid #ddd;
+               border-radius:6px;cursor:pointer;font-size:12px;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+
+</html>
